@@ -91,8 +91,20 @@ class Supervisor:
                     self.is_supervising = False
                     return None
                     
-                logger.info("Starting quectel_CM %s..." % self.path)
-                self.qcm_handle = Popen(self.path, stdin = PIPE, stdout = PIPE, stderr = PIPE, shell=False)
+                command = ['sudo', self.path]
+
+                # APN configured?
+                if self.apn is not None:
+                    if 'name' in self.apn:
+                        command.append('-s')
+                        command.append(self.apn['name'])
+                        if 'user' in self.apn:
+                            command.append(self.apn['user'])
+                        if 'pass' in self.apn:
+                            command.append(self.apn['pass'])
+
+                logger.info("Starting quectel_CM %s..." % ' '.join(command))
+                self.qcm_handle = Popen(command, stdin = PIPE, stdout = PIPE, stderr = PIPE, shell=False)
                 qcm_out = NonBlockingStreamReader(self.qcm_handle.stdout)
 
                 # Log the start
