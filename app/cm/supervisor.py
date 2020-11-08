@@ -2,7 +2,8 @@ import time
 import datetime
 import logging
 import threading
-from os import path
+import subprocess
+from os import path, system
 from subprocess import Popen, PIPE
 from nbsr import NonBlockingStreamReader
 
@@ -62,8 +63,11 @@ class Supervisor:
         """
         Restart quectel_CM
         """
-        self.__log_line(" *** KILLED due to restart @ %s" % datetime.datetime.now())
-        self.qcm_handle.kill()
+        try:
+            system('sudo kill -9 %d' % self.qcm_handle.pid)
+            self.__log_line(" *** KILLED due to restart @ %s" % datetime.datetime.now())
+        except:
+            pass
 
     def __log_line(self, line):
         """
@@ -104,7 +108,7 @@ class Supervisor:
                             command.append(self.apn['pass'])
 
                 logger.info("Starting quectel_CM %s..." % ' '.join(command))
-                self.qcm_handle = Popen(command, stdin = PIPE, stdout = PIPE, stderr = PIPE, shell=False)
+                self.qcm_handle = Popen(command, stdin = PIPE, stdout = PIPE, stderr = subprocess.STDOUT, shell=False)
                 qcm_out = NonBlockingStreamReader(self.qcm_handle.stdout)
 
                 # Log the start
