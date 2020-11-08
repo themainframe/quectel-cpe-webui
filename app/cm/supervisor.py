@@ -108,8 +108,9 @@ class Supervisor:
                             command.append(self.apn['pass'])
 
                 logger.info("Starting quectel_CM %s..." % ' '.join(command))
-                self.qcm_handle = Popen(command, stdin = PIPE, stdout = PIPE, stderr = subprocess.STDOUT, shell=False)
+                self.qcm_handle = Popen(command, stdin = PIPE, stdout = PIPE, stderr = subprocess.STDOUT, shell=True)
                 qcm_out = NonBlockingStreamReader(self.qcm_handle.stdout)
+                qcm_err = NonBlockingStreamReader(self.qcm_handle.stderr)
 
                 # Log the start
                 self.__log_line(" *** STARTED PID %d @ %s" % (self.qcm_handle.pid, datetime.datetime.now()))
@@ -126,7 +127,11 @@ class Supervisor:
                         if not output:
                             break
                         self.__log_line(output.decode().strip())
-                    
+                        err = qcm_err.readline(0.1)
+                        if not err:
+                            break
+                        self.__log_line(err.decode().strip())
+
                     retcode = self.qcm_handle.poll()
                     
                     if retcode is not None:
