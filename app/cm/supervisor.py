@@ -2,9 +2,8 @@ import time
 import datetime
 import logging
 import threading
-import subprocess
+import pexpect
 from os import path, system
-from subprocess import Popen, PIPE
 from nbsr import NonBlockingStreamReader
 
 logger = logging.getLogger(__name__)
@@ -95,7 +94,7 @@ class Supervisor:
                     self.is_supervising = False
                     return None
                     
-                command = ['sudo', self.path]
+                command = [self.path]
 
                 # APN configured?
                 if self.apn is not None:
@@ -108,9 +107,7 @@ class Supervisor:
                             command.append(self.apn['pass'])
 
                 logger.info("Starting quectel_CM %s..." % ' '.join(command))
-                self.qcm_handle = Popen(command, stdin = PIPE, stdout = PIPE, stderr = subprocess.STDOUT, shell=True)
-                qcm_out = NonBlockingStreamReader(self.qcm_handle.stdout)
-                qcm_err = NonBlockingStreamReader(self.qcm_handle.stderr)
+                self.qcm_handle = pexpect.spawn('sudo', command)
 
                 # Log the start
                 self.__log_line(" *** STARTED PID %d @ %s" % (self.qcm_handle.pid, datetime.datetime.now()))
@@ -123,23 +120,23 @@ class Supervisor:
 
                     # Read all output
                     while True:
-                        output = qcm_out.readline(0.1)
-                        if not output:
-                            break
-                        self.__log_line(output.decode().strip())
-                        err = qcm_err.readline(0.1)
-                        if not err:
-                            break
-                        self.__log_line(err.decode().strip())
-
-                    retcode = self.qcm_handle.poll()
-                    
-                    if retcode is not None:
+                        try:
+                            output = self.qcm_handle.read_nonblocking(1024, 1)
+                            if not output:
+                                break
+                            lines = output.split(b"\n")
+                            for line in lines:
+                                self.__log_line(line.decode().strip())
+                        except:
+                            pass
+                        
+                    if not self.qcm_handle.isalive():
                         self.qcm_handle = None
-                        logger.warn("Quectel_CM terminated with code %d - waiting %dms before relaunch..." % (retcode, self.respawn_delay))
+                        exitcode = self.qcm_handle.exitcode
+                        logger.warn("Quectel_CM terminated with code %d - waiting %dms before relaunch..." % (exitcode, self.respawn_delay))
 
                         # Log the termination
-                        self.__log_line(" *** TERMINATED @ %s with exit code %d" % (datetime.datetime.now(), retcode))
+                        self.__log_line(" *** TERMINATED @ %s with exit code %d" % (datetime.datetime.now(), exitcode))
 
                         # Wait the delay time...
                         time.sleep(self.respawn_delay / 1000)
