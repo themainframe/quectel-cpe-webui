@@ -32,11 +32,14 @@ class Poller:
         # Send polled data to StatsD?
         self.statsd_client = None
         if statsd_config is not None and 'host' in statsd_config:
-            self.statsd_client = statsd.StatsClient(
-                statsd_config['host'],
-                statsd_config['port'] if 'port' in statsd_config else 8125, prefix='quectel_cpe'
-            )
-
+            try:
+                self.statsd_client = statsd.StatsClient(
+                    statsd_config['host'],
+                    statsd_config['port'] if 'port' in statsd_config else 8125, prefix='quectel_cpe'
+                )
+            except statsd_err:
+                logger.warn("Could not connect to statsd host %s: %s" % (statsd_config['host'], statsd_err))
+                
         # Import all the command classes
         self.commands = []
         for command_name, command_class in inspect.getmembers(
