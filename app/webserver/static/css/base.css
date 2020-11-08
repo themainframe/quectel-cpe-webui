@@ -1,0 +1,55 @@
+html, body {
+    font-family: sans-serif;
+    padding: 0;
+    margin: 0;
+}
+
+template {
+    display: none;
+}
+
+/** Header **/
+
+.header {
+    background: #dfdfdf;
+    padding: 0 20px;
+    border-bottom: 2px groove #afafaf;
+}
+
+.header > * {
+    display: inline-block;
+    line-height: 40px;
+}
+
+.header > .brand {
+    font-weight: bold;
+    margin-right: 20px;
+}
+
+.header > a {
+    margin-right: 10px;
+    padding: 0 10px;
+    color: #000;
+    text-decoration: none;
+}
+
+.header > a.active {
+    background: #fefefe;
+}
+
+/** Main page contaner **/
+
+.container {
+    padding: 20px;
+}
+
+/** Status view **/
+
+
+/** CM Log **/
+.cmlog {
+    width: 100%;
+    max-height: 600px;
+    background: rgb(245, 245, 245);
+    overflow-y: scroll;
+}

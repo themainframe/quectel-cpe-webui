@@ -1,0 +1,53 @@
+import os
+import sys
+import logging
+import yaml
+import time
+
+from cm import Supervisor
+from at import Poller
+from webserver import Webserver
+
+# Set up the logging subsystem
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+stdout_handler = logging.StreamHandler(sys.stderr)
+stdout_handler.setFormatter(logging.Formatter('<%(levelname)s> %(name)s: %(message)s'))
+logger.addHandler(stdout_handler)
+
+# Read configuration
+config_path = os.path.dirname(__file__) + '/config.yml'
+if not os.path.exists(config_path):
+    raise IOError("The configuration file - %s - could not be found." % config_path)
+
+config = {}
+with open(config_path, 'r') as ymlfile:
+    config = yaml.load(ymlfile, Loader=yaml.SafeLoader)
+    logger.info("Loaded %d configuration items from %s" % (len(config), config_path))
+
+# Create the supervisor instance
+cm_supervisor = Supervisor(
+    config['cm']['path'],
+    config['cm']['respawn_delay'],
+    config['cm']['apn'],
+    config['cm']['log_lines']
+)
+cm_supervisor.start()
+
+# Create the AT command poller
+at_poller = Poller(
+    config['at']['dev'],
+    config['at']['poll_delay'],
+    config['at']['statsd'] if 'statsd' in config['at'] else None
+)
+at_poller.start()
+
+# Create the webserver
+server = Webserver(config['web']['port'], at_poller, cm_supervisor)
+
+# Start the server
+server.start_server()
+
+# Keep the main thread alive in case the web server was configured not to start
+while cm_supervisor.is_supervising:
+    time.sleep(1)

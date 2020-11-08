@@ -1,0 +1,86 @@
+{% extends 'base.j2' %}
+
+{% block body %}
+
+<section class="section">
+    <div class="container is-fluid">
+
+        <h2 class="title">
+            CM Status
+        </h2>
+        <h4 class="subtitle">
+            Connection Manager Status
+        </h4>
+        <table class="table is-fullwidth is-hoverable">
+        <tbody>
+            <tr class="{{ "has-background-success-light" if supervisor.qcm_handle else "has-background-danger-light" }}">
+                <th>
+                    Status
+                    <div class="has-text-grey-light is-size-7 has-text-weight-normal">Quectel_CM Status</div>
+                </th>
+                <td class="has-text-right is-size-4 has-text-weight-bold">
+                    {{ "Running" if supervisor.qcm_handle else "Not Running" }}
+                </td>
+            </tr>
+        </tbody>
+        </table>
+
+        <br />
+
+        <h2 class="title">
+            UE Status
+        </h2>
+        <h4 class="subtitle">
+            User Equipment Status Information
+        </h4>
+
+        {% set ns = namespace(rendered_row=False) %} 
+
+        <table class="table is-fullwidth is-hoverable">
+        <tbody>
+
+            {% for command in commands -%}
+                {% if command.results|length > 0 -%}
+                        {% set ns.rendered_row = True %}
+
+                        <tr>
+                            <th colspan="4">
+                                <h1 class="is-size-5 has-text-weight-bold">{{ command.name }}</h1>
+                                <p class="has-text-grey-light is-size-6">{{ command.description }}</p>
+                            </th>
+                        </tr>
+
+                        {% for result in command.results -%}
+                        <tr class="{{ bulma_class(result.state) }}">
+                            <th>
+                                {{ result.name }}
+                                <div class="has-text-grey-light is-size-7 has-text-weight-normal">{{ result.description }}</div>
+                            </th>
+                            <td class="has-text-right is-size-4 has-text-weight-bold">{{ result.value }}</td>
+                        </tr>
+                        {%- endfor %}
+
+                {%- endif %}
+            {%- endfor %}
+
+        </tbody>
+        </table>
+        
+        {% if ns.rendered_row == False -%}
+
+        <div class="notification is-warning is-light">
+            <strong>No AT status information is currently available.</strong>
+            <p>Please check to ensure that the modem is operation and interactive via the configured AT interface in <code>config.yml</code>.</p>
+        </div>
+
+        {%- endif %}
+
+    </div>
+</section>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script type="text/javascript" src="static/js/home.js"></script>
+{% endblock %}

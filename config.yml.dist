@@ -1,0 +1,48 @@
+---
+#
+# Copy this file into app/ and modify it as required.
+#
+
+# Web server configuration
+web:
+  port: 8080
+
+# Quectel_CM configuration
+cm:
+
+  # Path to the quectel_CM "Quectel Connection Manager" binary
+  path: ./test/quectel_CM
+
+  # Maximum relaunch rate (in ms)
+  # If quectel_CM dies instantly, this way we won't spam-respawn it
+  respawn_delay: 5000
+
+  # APN configuration
+  apn:
+    
+    # These come from your cellular operator
+    # Most of them don't care anymore as long as `name` is right.
+    name: three.co.uk
+    user: ""
+    pass: ""
+
+    # APN auth type (typically just 0)
+    auth: 0
+
+  # Number of log lines to keep
+  log_lines: 1000
+
+# AT command poller setup
+at:
+
+  # Modem AT serial port device file (for AT commands)
+  # If this is omitted or inaccessible, we won't display things like RSSI
+  dev: /dev/cu.usbserial-A903QXQY
+
+  # How quickly we should poll for registration/signal quality info (interval in ms)
+  poll_delay: 2500
+
+  # Dispatch collected data to statsd?
+  statsd:
+    host: services
+

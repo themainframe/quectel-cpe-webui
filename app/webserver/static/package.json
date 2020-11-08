@@ -1,0 +1,13 @@
+{
+  "name": "quectel-cpe-webui",
+  "version": "1.0.0",
+  "description": "Supervises Quectel_CM for Quectel LTE/5G modems, displaying status via a simple web app",
+  "main": "index.js",
+  "scripts": {},
+  "author": "Damien Walsh <me@damow.met> (http://damow.net)",
+  "license": "ISC",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.10.2",
+    "bulma": "0.9.0"
+  }
+}
