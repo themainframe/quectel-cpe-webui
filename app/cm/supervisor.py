@@ -126,7 +126,8 @@ class Supervisor:
                                 break
                             lines = output.split(b"\n")
                             for line in lines:
-                                self.__log_line(line.decode().strip())
+                                if line.decode().strip() != '':
+                                    self.__log_line(line.decode().strip())
                         except:
                             pass
                         

@@ -36,7 +36,7 @@ class ServingCellCommand(Command):
         for result_line in cmd_result[1]:
 
             # Process the result line for any status details
-            status_matches = re.match(r'\+QENG:\s?"servingcell","(.*)"', result_line)
+            status_matches = re.match(r'\+QENG:\s?"servingcell","(.*?)"', result_line)
             if status_matches is not None:
                 self.results.append(ResultValue("status", "UE Status", "Overall UE Status", status_matches.group(1)))
 
