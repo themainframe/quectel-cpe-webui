@@ -74,14 +74,17 @@ class Supervisor:
         """
 
         try:
-            self.qcm_handle.kill()
+            self.qcm_handle.kill(sig=9)
             self.is_killed = True
+            logger.info("Killed using kill()")
+            return
         except Exception as int_kill_ex:
             logger.warn("Failed to kill using kill() method: %s" % int_kill_ex)
 
         try:
             system('sudo kill -9 %d' % self.qcm_handle.pid)
             self.is_killed = True
+            logger.info("Killed using kill signal")
         except Exception as ext_kill_ex:
             logger.warn("Failed to kill using kill signal: %s" % ext_kill_ex)
 
@@ -147,10 +150,10 @@ class Supervisor:
                                 if line.decode().strip() != '':
                                     self.__log_line(line.decode().strip())
                         except:
-                            pass
+                            break
                         
                     if not self.qcm_handle.isalive() or self.is_killed:
-                        exitcode = self.qcm_handle.exitcode
+                        exitcode = self.qcm_handle.exitstatus if self.qcm_handle.exitstatus is not None else -1
                         logger.warn("Quectel_CM terminated with code %d - waiting %dms before relaunch..." % (exitcode, self.respawn_delay))
 
                         # Log the termination
