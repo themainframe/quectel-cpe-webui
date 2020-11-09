@@ -70,6 +70,7 @@ class Supervisor:
         Kill quectel_CM
         """
         try:
+            self.qcm_handle.kill()
             system('sudo kill -9 %d' % self.qcm_handle.pid)
         except:
             pass
@@ -138,7 +139,6 @@ class Supervisor:
                             pass
                         
                     if not self.qcm_handle.isalive():
-                        self.qcm_handle = None
                         exitcode = self.qcm_handle.exitcode
                         logger.warn("Quectel_CM terminated with code %d - waiting %dms before relaunch..." % (exitcode, self.respawn_delay))
 
