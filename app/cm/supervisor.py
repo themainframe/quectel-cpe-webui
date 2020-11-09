@@ -75,14 +75,15 @@ class Supervisor:
 
         try:
             self.qcm_handle.kill()
-        except:
-            pass
+            self.is_killed = True
+        except Exception as int_kill_ex:
+            logger.warn("Failed to kill using kill() method: %s" % int_kill_ex)
 
         try:
             system('sudo kill -9 %d' % self.qcm_handle.pid)
             self.is_killed = True
-        except:
-            pass
+        except Exception as ext_kill_ex:
+            logger.warn("Failed to kill using kill signal: %s" % ext_kill_ex)
 
     def __log_line(self, line):
         """
