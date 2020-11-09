@@ -37,6 +37,9 @@ class Supervisor:
         # The log buffer
         self.log = []
 
+        # Was the process killed by us?
+        self.is_killed = False
+
         # QCM Popen handle
         self.qcm_handle = None
 
@@ -69,9 +72,15 @@ class Supervisor:
         """
         Kill quectel_CM
         """
+
         try:
             self.qcm_handle.kill()
+        except:
+            pass
+
+        try:
             system('sudo kill -9 %d' % self.qcm_handle.pid)
+            self.is_killed = True
         except:
             pass
 
@@ -115,6 +124,7 @@ class Supervisor:
 
                 logger.info("Starting quectel_CM %s..." % ' '.join(command))
                 self.qcm_handle = pexpect.spawn('sudo', command)
+                self.is_killed = False
 
                 # Log the start
                 self.__log_line(" *** STARTED PID %d @ %s" % (self.qcm_handle.pid, datetime.datetime.now()))
@@ -138,7 +148,7 @@ class Supervisor:
                         except:
                             pass
                         
-                    if not self.qcm_handle.isalive():
+                    if not self.qcm_handle.isalive() or self.is_killed:
                         exitcode = self.qcm_handle.exitcode
                         logger.warn("Quectel_CM terminated with code %d - waiting %dms before relaunch..." % (exitcode, self.respawn_delay))
 
