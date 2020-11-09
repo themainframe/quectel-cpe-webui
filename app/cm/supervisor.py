@@ -49,7 +49,6 @@ class Supervisor:
         Start quectel_CM
         """
         logger.info("Starting supervision of quectel_CM @ %s" % self.path)
-        self.is_supervising = True
         self.__supervise_thread.start()
 
     def stop(self):
@@ -57,14 +56,21 @@ class Supervisor:
         Stop quectel_CM
         """
         self.is_supervising = False
+        self.__kill()
 
     def restart(self):
         """
         Restart quectel_CM
         """
+        self.__log_line(" *** KILLED due to restart @ %s" % datetime.datetime.now())
+        self.__kill()
+
+    def __kill(self):
+        """
+        Kill quectel_CM
+        """
         try:
             system('sudo kill -9 %d' % self.qcm_handle.pid)
-            self.__log_line(" *** KILLED due to restart @ %s" % datetime.datetime.now())
         except:
             pass
 
