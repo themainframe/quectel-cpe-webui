@@ -38,7 +38,20 @@ class ServingCellCommand(Command):
             # Process the result line for any status details
             status_matches = re.match(r'\+QENG:\s?"servingcell","(.*?)"', result_line)
             if status_matches is not None:
-                self.results.append(ResultValue("status", "UE Status", "Overall UE Status", status_matches.group(1)))
+                status = status_matches.group(1)
+                status_rv = ResultValue("status", "UE Status", "Overall UE Status", status)
+
+                # Colour the status based on value
+                if status == "SEARCH":
+                    status_rv.state = ResultValueState.ERROR
+                elif status == "LIMSRV":
+                    status_rv.state = ResultValueState.WARNING
+                elif status == "NOCONN" or status == "CONNECT":
+                    status_rv.state = ResultValueState.OK
+                else:
+                    status_rv.state = ResultValueState.ERROR
+
+                self.results.append(status_rv)
 
             # Process the result line for any technology details
             tech_matches = re.search(r'"(LTE|NR5G-NSA|WCDMA)",(.*)', result_line)
@@ -61,7 +74,7 @@ class ServingCellCommand(Command):
                 # Process LTE group
                 lte_params = tech_matches.group(2).split(",")
                 if len(lte_params) >= 14:
-                    self.results.append(ResultValue("lte_dup_type", "LTE Duplex", "LTE Duplex Mode", lte_params[0]))
+                    self.results.append(ResultValue("lte_dup_type", "LTE Duplex", "LTE Duplex Mode", lte_params[0].replace("\"", "")))
                     self.results.append(ResultValue("lte_mcc", "LTE MCC", "LTE Mobile Country Code", lte_params[1]))
                     self.results.append(ResultValue("lte_mnc", "LTE MNC", "LTE Mobile Network Code", lte_params[2]))
                     self.results.append(ResultValue("lte_cid", "LTE Cell ID", "LTE Cell ID", lte_params[3]))

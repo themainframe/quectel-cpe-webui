@@ -13,6 +13,18 @@ class SignalQualityCommand(Command):
     def __init__(self):
         super().__init__("Signal Quality", "Cell Signal Quality Information")
 
+    @staticmethod
+    def __get_csq_state(csq):
+        """
+        Get a state classification for a CSQ level.
+        """
+        if csq == 99 or csq < 6:
+            return ResultValueState.ERROR
+        elif csq < 12:
+            return ResultValueState.WARNING
+        else:
+            return ResultValueState.OK
+
     def poll(self, serial_port):
 
         # Send the Serving Cell query
@@ -39,7 +51,13 @@ class SignalQualityCommand(Command):
             if csq_matches is None:
                 continue
             
-            self.results.append(ResultValue("csq", "Signal Quality (CSQ)", "Signal Strength Indication (0-31)", csq_matches.group(1)))
+            self.results.append(ResultValue(
+                "csq",
+                "Signal Quality (CSQ)",
+                "Signal Strength Indication (0-31)",
+                csq_matches.group(1),
+                self.__get_csq_state(csq_matches.group(1))
+            ))
             self.results.append(ResultValue("csq_ber", "Channel BER", "Channel Bit Error Rate", csq_matches.group(2)))
 
 
