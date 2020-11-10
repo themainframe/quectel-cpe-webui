@@ -56,7 +56,7 @@ class SignalQualityCommand(Command):
                 "Signal Quality (CSQ)",
                 "Signal Strength Indication (0-31)",
                 csq_matches.group(1),
-                self.__get_csq_state(csq_matches.group(1))
+                self.__get_csq_state(int(csq_matches.group(1)))
             ))
             self.results.append(ResultValue("csq_ber", "Channel BER", "Channel Bit Error Rate", csq_matches.group(2)))
 
