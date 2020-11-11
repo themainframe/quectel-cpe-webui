@@ -83,6 +83,9 @@ class Poller:
             # While we've not been terminated
             while self.is_polling:
 
+                # Wait a while before opening
+                time.sleep(7.5)
+
                 logger.info("Opening serial port %s..." % self.dev)
                 try:
                     at_handle = serial.Serial(self.dev, 115200, timeout=3)
