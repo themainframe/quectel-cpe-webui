@@ -87,7 +87,7 @@ class Poller:
                 at_handle = serial.Serial(self.dev, 115200, timeout=3)
                 
                 # While connected...
-                while True:
+                while at_handle is not None and at_handle.is_open:
 
                     # Wait the poll delay
                     time.sleep(self.poll_delay / 1000)
