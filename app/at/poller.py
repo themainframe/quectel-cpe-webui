@@ -84,8 +84,13 @@ class Poller:
             while self.is_polling:
 
                 logger.info("Opening serial port %s..." % self.dev)
-                at_handle = serial.Serial(self.dev, 115200, timeout=3)
-                
+                try:
+                    at_handle = serial.Serial(self.dev, 115200, timeout=3)
+                    logger.info("Serial port open.")
+                except Exception as serial_open_ex:
+                    at_handle = None
+                    logger.warn("Could not open the AT port: %s" % serial_open_ex)
+                    
                 # While connected...
                 while at_handle is not None and at_handle.is_open:
 
