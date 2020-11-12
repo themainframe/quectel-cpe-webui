@@ -109,24 +109,20 @@ class Supervisor:
         Maintain the quectel_CM instance
         """
         self.is_supervising = True
-        first = True
+        relaunches = -1
 
         try:
 
             # While we've not been terminated
             while self.is_supervising:
 
-                # Clean-init of the modem
-                if not first:
-
-                    # Reset the modem
+                # Have we relaunched lots of times? if so, restart the modem and wait a while for it to come back up
+                if relaunches > 10:
+                    logger.warn("%d consecutive relaunches - low-level restarting modem..." % relaunches)
                     self.poller.inject("AT+CFUN=0")
                     self.poller.inject("AT+CFUN=1,1")
-                    
-                    # Wait an extra 10 seconds
-                    time.sleep(10)
-
-                first = False
+                    time.sleep(30)
+                    relaunches = 0
 
                 # If the binary can't be found, stop supervising
                 if not path.isfile(self.path):
@@ -152,6 +148,7 @@ class Supervisor:
 
                 # Log the start
                 self.__log_line(" *** STARTED PID %d @ %s" % (self.qcm_handle.pid, datetime.datetime.now()))
+                relaunches += 1
                 
                 # Reset IP checker to give us time to get online
                 self.ip_checker.reset()
