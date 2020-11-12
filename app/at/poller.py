@@ -20,7 +20,7 @@ class Poller:
         Create a new poller.
         """
 
-        # The path to the quectel_CM binary
+        # The AT serial device file
         self.dev = dev
 
         # The delay in ms between polls

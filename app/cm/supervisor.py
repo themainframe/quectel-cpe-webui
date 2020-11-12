@@ -3,8 +3,8 @@ import datetime
 import logging
 import threading
 import pexpect
+from .internet_checker import InternetChecker
 from os import path, system
-from nbsr import NonBlockingStreamReader
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +46,10 @@ class Supervisor:
         # The thread on which the supervision will be done
         self.__supervise_thread = threading.Thread(target=self.__supervise)
         self.__supervise_thread.daemon = True
+
+        # Spawn an Internet Connectivity Checker to see if we need to restart Quectel_CM due to internet connectivity problems
+        self.ip_checker = InternetChecker()
+        self.ip_checker.start()
 
     def start(self):
         """
@@ -127,17 +131,21 @@ class Supervisor:
                             command.append(self.apn['pass'])
 
                 logger.info("Starting quectel_CM %s..." % ' '.join(command))
-                self.qcm_handle = pexpect.spawn('sudo', command)
+                self.qcm_handle = pexpect.spawn("sudo", command)
                 self.is_killed = False
 
                 # Log the start
                 self.__log_line(" *** STARTED PID %d @ %s" % (self.qcm_handle.pid, datetime.datetime.now()))
                 
+                # Reset IP checker to give us time to get online
+                self.ip_checker.reset()
+
                 # While running...
                 while True:
 
                     # Check the process each second
                     time.sleep(1.0)
+                    logger.info("Poll")
 
                     # Read all output
                     while True:
@@ -151,6 +159,11 @@ class Supervisor:
                                     self.__log_line(line.decode().strip())
                         except:
                             break
+
+                    # Shall we kill quectel_cm due to no internet connectivity for a period of time?
+                    if not self.ip_checker.has_internet():
+                        self.__log_line("Lost internet connectivity - killing & restarting Quectel_CM...")
+                        self.__kill()
                         
                     if not self.qcm_handle.isalive() or self.is_killed:
                         exitcode = self.qcm_handle.exitstatus if self.qcm_handle.exitstatus is not None else -1
