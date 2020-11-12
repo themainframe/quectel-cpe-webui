@@ -25,15 +25,6 @@ with open(config_path, 'r') as ymlfile:
     config = yaml.load(ymlfile, Loader=yaml.SafeLoader)
     logger.info("Loaded %d configuration items from %s" % (len(config), config_path))
 
-# Create the supervisor instance
-cm_supervisor = Supervisor(
-    config['cm']['path'],
-    config['cm']['respawn_delay'],
-    config['cm']['apn'],
-    config['cm']['log_lines']
-)
-cm_supervisor.start()
-
 # Create the AT command poller
 at_poller = Poller(
     config['at']['dev'],
@@ -41,6 +32,16 @@ at_poller = Poller(
     config['at']['statsd'] if 'statsd' in config['at'] else None
 )
 at_poller.start()
+
+# Create the supervisor instance
+cm_supervisor = Supervisor(
+    config['cm']['path'],
+    config['cm']['respawn_delay'],
+    config['cm']['apn'],
+    config['cm']['log_lines'],
+    at_poller
+)
+cm_supervisor.start()
 
 # Create the webserver
 server = Webserver(config['web']['port'], at_poller, cm_supervisor)

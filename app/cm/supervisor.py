@@ -14,7 +14,7 @@ class Supervisor:
     Keeps it alive & collects an output buffer.
     """
 
-    def __init__(self, path, respawn_delay, apn, log_lines):
+    def __init__(self, path, respawn_delay, apn, log_lines, poller):
         """
         Create a new supervisor.
         """
@@ -30,6 +30,9 @@ class Supervisor:
 
         # The number of log lines to buffer up
         self.log_lines = log_lines
+
+        # The AT poller used for injection of AT commands
+        self.poller = poller
 
         # Is quectel_CM being supervised? 
         self.is_supervising = False
@@ -106,11 +109,24 @@ class Supervisor:
         Maintain the quectel_CM instance
         """
         self.is_supervising = True
+        first = True
 
         try:
 
             # While we've not been terminated
             while self.is_supervising:
+
+                # Clean-init of the modem
+                if not first:
+
+                    # Reset the modem
+                    self.poller.inject("AT+CFUN=0")
+                    self.poller.inject("AT+CFUN=1,1")
+                    
+                    # Wait an extra 10 seconds
+                    time.sleep(10)
+
+                first = False
 
                 # If the binary can't be found, stop supervising
                 if not path.isfile(self.path):
@@ -145,7 +161,6 @@ class Supervisor:
 
                     # Check the process each second
                     time.sleep(1.0)
-                    logger.info("Poll")
 
                     # Read all output
                     while True:

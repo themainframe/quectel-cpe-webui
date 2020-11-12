@@ -26,6 +26,9 @@ class Poller:
         # The delay in ms between polls
         self.poll_delay = poll_delay
 
+        # List of commands that need to be injected
+        self.inject_commands = []
+
         # Are we polling periodically?
         self.is_polling = False
 
@@ -57,6 +60,16 @@ class Poller:
         # The thread on which the serial port sending will be performed
         self.__poll_thread = threading.Thread(target=self.__poll)
         self.__poll_thread.daemon = True
+
+    def inject(self, command):
+        """
+        Submit a command outside of the usual polling.
+        """
+        if self.is_polling:
+            logger.info("Command injection requested: \"%s\"" % command)
+            self.inject_commands.append(command)
+        else:
+            logger.warn("Cannot inject while not polling AT interface: %s" % command)
 
     def start(self):
         """
@@ -113,6 +126,15 @@ class Poller:
                                         logger.info("dispatch to statsd: %s -> %s" % (result.key, result.value))
                                     except:
                                         pass
+
+                        # Anything to inject?
+                        for inject_cmd in self.inject_commands:
+                            at_handle.write((inject_cmd + "\r\n").encode("utf-8"))
+                            logger.info("Inject AT command: %s" % inject_cmd)
+                            time.sleep(5)
+                            at_handle.flush()
+
+                        self.inject_commands.clear()
 
                     except Exception as serial_error:
                         logger.error("Serial comms error: %s" % serial_error)
