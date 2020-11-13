@@ -107,6 +107,10 @@ class Poller:
                     at_handle = None
                     logger.warn("Could not open the AT port: %s" % serial_open_ex)
                     
+                # Clear all the previous results
+                for command in self.commands:
+                    command.results = []
+
                 # While connected...
                 while at_handle is not None and at_handle.is_open:
 
