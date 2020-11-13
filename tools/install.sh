@@ -103,7 +103,7 @@ After=network.target
 [Service]
 User=${PI_USERNAME}
 WorkingDirectory=${PI_APP_PATH}
-ExecStart=/usr/bin/python3 ${PI_APP_PATH}/main.py
+ExecStart=/usr/bin/python3 ${PI_APP_PATH}/app/main.py
 Restart=always
 TimeoutStartSec=10
 RestartSec=10
