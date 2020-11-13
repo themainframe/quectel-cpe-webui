@@ -13,7 +13,7 @@
         </h4>
         <table class="table is-fullwidth is-hoverable">
         <tbody>
-            <tr class="{{ "has-background-success-light" if (not supervisor.qcm_handle.isalive() or supervisor.is_killed) else "has-background-danger-light" }}">
+            <tr class="{{ "has-background-danger-light" if (not supervisor.qcm_handle.isalive() or supervisor.is_killed) else "has-background-success-light" }}">
                 <th>
                     Status
                     <div class="has-text-grey-light is-size-7 has-text-weight-normal">Quectel_CM Status</div>
