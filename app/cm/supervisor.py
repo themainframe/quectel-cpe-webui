@@ -3,7 +3,6 @@ import datetime
 import logging
 import threading
 import pexpect
-from .internet_checker import InternetChecker
 from os import path, system
 
 logger = logging.getLogger(__name__)
@@ -14,7 +13,7 @@ class Supervisor:
     Keeps it alive & collects an output buffer.
     """
 
-    def __init__(self, path, respawn_delay, apn, log_lines, poller):
+    def __init__(self, path, respawn_delay, apn, log_lines, poller, ip_checker):
         """
         Create a new supervisor.
         """
@@ -51,7 +50,7 @@ class Supervisor:
         self.__supervise_thread.daemon = True
 
         # Spawn an Internet Connectivity Checker to see if we need to restart Quectel_CM due to internet connectivity problems
-        self.ip_checker = InternetChecker()
+        self.ip_checker = ip_checker
         self.ip_checker.start()
 
     def start(self):

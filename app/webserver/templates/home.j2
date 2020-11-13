@@ -13,13 +13,35 @@
         </h4>
         <table class="table is-fullwidth is-hoverable">
         <tbody>
-            <tr class="{{ "has-background-success-light" if supervisor.qcm_handle else "has-background-danger-light" }}">
+            <tr class="{{ "has-background-success-light" if (not supervisor.qcm_handle.isalive() or supervisor.is_killed) else "has-background-danger-light" }}">
                 <th>
                     Status
                     <div class="has-text-grey-light is-size-7 has-text-weight-normal">Quectel_CM Status</div>
                 </th>
                 <td class="has-text-right is-size-4 has-text-weight-bold">
-                    {{ "Running" if supervisor.qcm_handle else "Not Running" }}
+                    {{ "Not Running" if (not supervisor.qcm_handle.isalive() or supervisor.is_killed) else "Running" }}
+                </td>
+            </tr>
+        </tbody>
+        </table>
+
+        <br />
+
+        <h2 class="title">
+            IP Status
+        </h2>
+        <h4 class="subtitle">
+            Internet Connectivity Check
+        </h4>
+        <table class="table is-fullwidth is-hoverable">
+        <tbody>
+            <tr class="{{ "has-background-success-light" if ip_checker.has_internet() else "has-background-danger-light" }}">
+                <th>
+                    Status
+                    <div class="has-text-grey-light is-size-7 has-text-weight-normal">Internet Connection Status</div>
+                </th>
+                <td class="has-text-right is-size-4 has-text-weight-bold">
+                    {{ "Up" if ip_checker.has_internet() else "Down" }}
                 </td>
             </tr>
         </tbody>

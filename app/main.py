@@ -4,7 +4,7 @@ import logging
 import yaml
 import time
 
-from cm import Supervisor
+from cm import Supervisor, InternetChecker
 from at import Poller
 from webserver import Webserver
 
@@ -33,18 +33,22 @@ at_poller = Poller(
 )
 at_poller.start()
 
+# Create the internet connection checker
+ip_checker = InternetChecker()
+
 # Create the supervisor instance
 cm_supervisor = Supervisor(
     config['cm']['path'],
     config['cm']['respawn_delay'],
     config['cm']['apn'],
     config['cm']['log_lines'],
-    at_poller
+    at_poller,
+    ip_checker
 )
 cm_supervisor.start()
 
 # Create the webserver
-server = Webserver(config['web']['port'], at_poller, cm_supervisor)
+server = Webserver(config['web']['port'], at_poller, cm_supervisor, ip_checker)
 
 # Start the server
 server.start_server()

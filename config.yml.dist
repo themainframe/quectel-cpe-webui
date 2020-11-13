@@ -43,6 +43,5 @@ at:
   poll_delay: 2500
 
   # Dispatch collected data to statsd?
-  statsd:
-    host: services
+  statsd: ~
 

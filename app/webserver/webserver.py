@@ -9,13 +9,14 @@ class Webserver:
     Provides a web console for viewing CPE information.
     """
 
-    def __init__(self, port, at_poller, cm_supervisor):
+    def __init__(self, port, at_poller, cm_supervisor, ip_checker):
         """
         Create a new webserver.
         """
 
         # Provide the AT poller & supervisor objects to routes that need it
         self.port = port
+        Home.ip_checker = ip_checker
         Home.at_poller = at_poller
         Home.cm_supervisor = cm_supervisor
         

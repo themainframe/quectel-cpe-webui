@@ -13,6 +13,7 @@ class Home:
     blueprint = Blueprint('home', __name__)
     at_poller = None
     cm_supervisor = None
+    ip_checker = None
 
     @staticmethod
     def __bulma_class(state):
@@ -35,7 +36,8 @@ class Home:
             'home.j2',
             commands=Home.at_poller.commands,
             bulma_class=Home.__bulma_class,
-            supervisor=Home.cm_supervisor
+            supervisor=Home.cm_supervisor,
+            ip_checker=Home.ip_checker
         )
 
     @staticmethod
