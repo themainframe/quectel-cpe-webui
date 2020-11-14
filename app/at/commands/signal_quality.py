@@ -27,7 +27,7 @@ class SignalQualityCommand(Command):
 
     def poll(self, serial_port):
 
-        # Send the Serving Cell query
+        # Send the CSQ query
         logger.debug("Polling CSQ...")
         serial_port.write("AT+CSQ\r\n".encode("utf-8"))
 
