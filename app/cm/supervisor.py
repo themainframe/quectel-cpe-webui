@@ -129,7 +129,7 @@ class Supervisor:
                     self.is_supervising = False
                     return None
                     
-                command = [self.path]
+                command = [self.path, '-r']
 
                 # APN configured?
                 if self.apn is not None:
