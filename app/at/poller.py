@@ -127,7 +127,6 @@ class Poller:
                                 for result in command.results:
                                     try:
                                         self.statsd_client.gauge(result.key, float(result.value) if '.' in result.value else int(result.value))
-                                        logger.info("dispatch to statsd: %s -> %s" % (result.key, result.value))
                                     except:
                                         pass
 
