@@ -129,21 +129,24 @@ class Supervisor:
                     self.is_supervising = False
                     return None
 
-                command = [self.path, '-r']
+                command = [self.path, ' -r']
 
                 # APN configured?
                 if self.apn is not None:
                     if 'name' in self.apn:
-                        command.append('-s')
-                        command.append(self.apn['name'])
+                        command.append(' -s')
+                        command.append(f"{self.apn['name']}")
                         if 'user' in self.apn:
-                            command.append(self.apn['user'])
+                            command.append(f"{self.apn['user']}")
                         if 'pass' in self.apn:
-                            command.append(self.apn['pass'])
+                            command.append(f"{self.apn['pass']}")
 
-                logger.info("Starting quectel_CM %s..." % ' '.join(command))
+                command_joined=' '.join(command)
+
+                logger.info("Starting quectel_CM %s..." % command_joined)
                 #self.qcm_handle = pexpect.spawn("sudo", command)
-                self.qcm_handle = pexpect.spawn(command)
+                #self.qcm_handle = pexpect.spawn("sudo -u nc", command)
+                self.qcm_handle = pexpect.spawn(command_joined)
                 self.is_killed = False
 
                 # Log the start
