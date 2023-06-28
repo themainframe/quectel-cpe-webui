@@ -33,7 +33,7 @@ class Supervisor:
         # The AT poller used for injection of AT commands
         self.poller = poller
 
-        # Is quectel_CM being supervised? 
+        # Is quectel_CM being supervised?
         self.is_supervising = False
 
         # The log buffer
@@ -116,19 +116,19 @@ class Supervisor:
             while self.is_supervising:
 
                 # Have we relaunched lots of times? if so, restart the modem and wait a while for it to come back up
-                if relaunches > 10:
-                    logger.warn("%d consecutive relaunches - low-level restarting modem..." % relaunches)
-                    self.poller.inject("AT+CFUN=0")
-                    self.poller.inject("AT+CFUN=1,1")
-                    time.sleep(30)
-                    relaunches = 0
+                #if relaunches > 10:
+                #    logger.warn("%d consecutive relaunches - low-level restarting modem..." % relaunches)
+                #    self.poller.inject("AT+CFUN=0")
+                #    self.poller.inject("AT+CFUN=1,1")
+                #    time.sleep(30)
+                #    relaunches = 0
 
                 # If the binary can't be found, stop supervising
                 if not path.isfile(self.path):
                     logger.error("Quectel_CM path %s does not exist - cannot start" % self.path)
                     self.is_supervising = False
                     return None
-                    
+
                 command = [self.path, '-r']
 
                 # APN configured?
@@ -142,13 +142,14 @@ class Supervisor:
                             command.append(self.apn['pass'])
 
                 logger.info("Starting quectel_CM %s..." % ' '.join(command))
-                self.qcm_handle = pexpect.spawn("sudo", command)
+                #self.qcm_handle = pexpect.spawn("sudo", command)
+                self.qcm_handle = pexpect.spawn(command)
                 self.is_killed = False
 
                 # Log the start
                 self.__log_line(" *** STARTED PID %d @ %s" % (self.qcm_handle.pid, datetime.datetime.now()))
                 relaunches += 1
-                
+
                 # Reset IP checker to give us time to get online
                 self.ip_checker.reset()
 
@@ -175,7 +176,7 @@ class Supervisor:
                     if not self.ip_checker.has_internet():
                         self.__log_line("Lost internet connectivity - killing & restarting Quectel_CM...")
                         self.__kill()
-                        
+
                     if not self.qcm_handle.isalive() or self.is_killed:
                         exitcode = self.qcm_handle.exitstatus if self.qcm_handle.exitstatus is not None else -1
                         logger.warn("Quectel_CM terminated with code %d - waiting %dms before relaunch..." % (exitcode, self.respawn_delay))
@@ -185,7 +186,7 @@ class Supervisor:
 
                         # Wait the delay time...
                         time.sleep(self.respawn_delay / 1000)
-                        
+
                         # Break out to respawn...
                         break
 
