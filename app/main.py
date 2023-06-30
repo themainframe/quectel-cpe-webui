@@ -3,10 +3,17 @@ import sys
 import logging
 import yaml
 import time
+import signal
 
 from cm import Supervisor, InternetChecker
 from at import Poller
 from webserver import Webserver
+
+# Set up signal handlers
+def signal_handler(sig, frame):
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
 
 # Set up the logging subsystem
 logger = logging.getLogger()
@@ -14,6 +21,12 @@ logger.setLevel(logging.INFO)
 stdout_handler = logging.StreamHandler(sys.stderr)
 stdout_handler.setFormatter(logging.Formatter('<%(levelname)s> %(name)s: %(message)s'))
 logger.addHandler(stdout_handler)
+
+# Make sure that npm install has been run
+node_modules_path = os.path.join(os.path.dirname(__file__), 'webserver', 'static', 'node_modules')
+if not os.path.exists(node_modules_path):
+    logging.error("The node_modules directory does not exist. Please run 'npm install' in the webserver/static directory.")
+    exit(1)
 
 # Read configuration
 config_path = os.path.dirname(__file__) + '/config.yml'

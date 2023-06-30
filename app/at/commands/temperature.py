@@ -18,9 +18,9 @@ class TemperatureCommand(Command):
         """
         Get a state classification for a temperature.
         """
-        if temp > 50:
+        if temp > 70:
             return ResultValueState.ERROR
-        elif temp > 40 :
+        elif temp > 50 :
             return ResultValueState.WARNING
         else:
             return ResultValueState.OK
@@ -39,7 +39,7 @@ class TemperatureCommand(Command):
 
         # Clear the results
         self.results = []
-        
+
         if not cmd_result[0]:
             logger.warn("No response to Temperature query")
             # No results to work with
@@ -50,7 +50,7 @@ class TemperatureCommand(Command):
             temp_matches = re.match(r'\+QTEMP:\s?"([a-z0-9\-]+)","(\d+)"', result_line)
             if temp_matches is None:
                 continue
-            
+
             self.results.append(ResultValue(
                 "temp_" + temp_matches.group(1),
                 temp_matches.group(1) + " Temperature",
