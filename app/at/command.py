@@ -29,7 +29,7 @@ class Command:
         self.name = name
         self.description = description
         self.results = []
-        
+
         # The time when the command was last checked
         self.last_update = None
 
@@ -45,12 +45,12 @@ class Command:
         # The receive buffer
         r_buf = ""
 
-        # The result state - 
+        # The result state -
         result_state = None
         result_lines = []
 
         while True:
-            
+
             # Have we waited too long?
             #if total_waited > timeout:
             if time.time() - start_time > timeout:
@@ -79,7 +79,7 @@ class Command:
                     if r_line.upper() in success:
                         result_state = True
                         break
-                    
+
                     # Bad result?
                     if r_line.upper() in failure:
                         result_state = False

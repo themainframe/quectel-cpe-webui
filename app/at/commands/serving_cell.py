@@ -120,7 +120,7 @@ class ServingCellCommand(Command):
                     self.results.append(ResultValue("lte_sinr", "LTE SINR", "LTE Signal:Noise+Intrf. Ratio", lte_params[13]))
                     self.results.append(ResultValue("lte_cqi", "LTE CQI", "LTE Channel Quality Indicator", lte_params[14]))
                     self.results.append(ResultValue("lte_tx_power", "LTE TX Power", "LTE Transmit Power (dBmW)", lte_params[15]))
-                    self.results.append(ResultValue("nr_sa_srxlev", "LTE SRXLev", "LTE Signal:Suitable Reception Level", nr_params[13]))
+                    self.results.append(ResultValue("nr_sa_srxlev", "LTE SRXLev", "LTE Signal:Suitable Reception Level", lte_params[13]))
             elif tech_matches.group(1) == 'WCDMA':
                 # Process UMTS group
                 wcdma_params = tech_matches.group(2).split(",")

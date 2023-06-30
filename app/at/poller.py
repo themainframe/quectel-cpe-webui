@@ -106,7 +106,7 @@ class Poller:
                 except Exception as serial_open_ex:
                     at_handle = None
                     logger.warn("Could not open the AT port: %s" % serial_open_ex)
-                    
+
                 # Clear all the previous results
                 for command in self.commands:
                     command.results = []
@@ -119,7 +119,7 @@ class Poller:
                     try:
                         # Poll each of the registered AT commands
                         for command in self.commands:
-                            
+
                             # Collect results from the command
                             command.poll(at_handle)
 
@@ -145,7 +145,7 @@ class Poller:
                             at_handle.close()
                         except:
                             pass
-                        break
+                        raise
 
         except Exception as poll_ex:
             logger.error('Error polling AT interface %s: %s' % (self.dev, poll_ex))

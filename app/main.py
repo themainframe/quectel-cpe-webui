@@ -38,10 +38,10 @@ ip_checker = InternetChecker()
 
 # Create the supervisor instance
 cm_supervisor = Supervisor(
-    config['cm']['path'],
-    config['cm']['respawn_delay'],
-    config['cm']['apn'],
-    config['cm']['log_lines'],
+    #config['cm']['path'],
+    #config['cm']['respawn_delay'],
+    #config['cm']['apn'],
+    #config['cm']['log_lines'],
     at_poller,
     ip_checker
 )

@@ -8,7 +8,7 @@
         <h2 class="title">
             CM Status
         </h2>
-        <h4 class="subtitle">
+        {# <h4 class="subtitle">
             Connection Manager Status
         </h4>
         <table class="table is-fullwidth is-hoverable">
@@ -24,7 +24,7 @@
             </tr>
         </tbody>
         </table>
-
+ #}
         <br />
 
         <h2 class="title">
@@ -56,7 +56,7 @@
             User Equipment Status Information
         </h4>
 
-        {% set ns = namespace(rendered_row=False) %} 
+        {% set ns = namespace(rendered_row=False) %}
 
         <table class="table is-fullwidth is-hoverable">
         <tbody>
@@ -87,7 +87,7 @@
 
         </tbody>
         </table>
-        
+
         {% if ns.rendered_row == False -%}
 
         <div class="notification is-warning is-light">
